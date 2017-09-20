@@ -20,7 +20,7 @@ class ReportingServiceManager:
     or :meth:`.ReportingDownloadOperation.track`, and then download the file with the
     :meth:`.ReportingOperation.download_result_file` method.
     """
-    def __init__(self, authorization_data, poll_interval_in_milliseconds=5000, environment='production', working_directory=None, **suds_options):
+    def __init__(self, authorization_data, poll_interval_in_milliseconds=5000, environment='production', working_directory=None, service_client=None, **suds_options):
         """ Initialize a new instance of this class.
 
         :param authorization_data: Represents a user who intends to access the corresponding customer and account.
@@ -34,9 +34,12 @@ class ReportingServiceManager:
                                     (for example :func:`upload_entities` creates a temporary upload file).
         :param suds_options: The suds options need to pass to suds client
         """
-
-        self._environment = environment
-        self._service_client = ServiceClient('ReportingService', authorization_data, environment, 9, **suds_options)
+        
+        if not service_client:
+            service_client = ServiceClient('ReportingService', authorization_data, environment, 9, **suds_options)
+        
+        self._environment = environment 
+        self._service_client = service_client
         self._authorization_data = authorization_data
         self._poll_interval_in_milliseconds = poll_interval_in_milliseconds
         self._working_directory = os.path.join(tempfile.gettempdir(), WORKING_NAME)
